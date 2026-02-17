@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
-# Gerago — Pre-fetch data for tool-less local models
-# Usage: gerago <command> [options]
+# Grago — Pre-fetch data for tool-less local models
+# Usage: grago <command> [options]
 
 set -euo pipefail
 
 VERSION="0.1.0"
-CONFIG_DIR="${HOME}/.gerago"
+CONFIG_DIR="${HOME}/.grago"
 CONFIG_FILE="${CONFIG_DIR}/config.yaml"
 DEFAULT_MODEL="gemma"
 DEFAULT_TIMEOUT=30
@@ -14,8 +14,8 @@ DEFAULT_FORMAT="markdown"
 
 # --- Helpers ---
 
-log() { echo "[gerago] $*" >&2; }
-err() { echo "[gerago] ERROR: $*" >&2; exit 1; }
+log() { echo "[grago] $*" >&2; }
+err() { echo "[grago] ERROR: $*" >&2; exit 1; }
 
 ensure_deps() {
   for cmd in curl jq; do
@@ -88,7 +88,7 @@ cmd_fetch() {
     esac
   done
   
-  [[ -z "$url" ]] && err "Usage: gerago fetch <url> [--analyze <prompt>] [--transform <cmd>]"
+  [[ -z "$url" ]] && err "Usage: grago fetch <url> [--analyze <prompt>] [--transform <cmd>]"
   
   local data
   data=$(curl -sL --max-time "$TIMEOUT" "$url") || err "Failed to fetch: $url"
@@ -116,7 +116,7 @@ cmd_research() {
     esac
   done
   
-  [[ -z "$sources_file" ]] && err "Usage: gerago research --sources <file> --prompt <question>"
+  [[ -z "$sources_file" ]] && err "Usage: grago research --sources <file> --prompt <question>"
   [[ ! -f "$sources_file" ]] && err "Sources file not found: $sources_file"
   
   local combined=""
@@ -178,7 +178,7 @@ cmd_pipe() {
     esac
   done
   
-  [[ -z "$fetch_cmd" ]] && err "Usage: gerago pipe --fetch <cmd> [--transform <cmd>] --analyze <prompt>"
+  [[ -z "$fetch_cmd" ]] && err "Usage: grago pipe --fetch <cmd> [--transform <cmd>] --analyze <prompt>"
   
   local data
   data=$(eval "$fetch_cmd") || err "Fetch command failed"
@@ -190,11 +190,11 @@ cmd_pipe() {
   echo "$data" | analyze "${prompt:-Summarize this data.}"
 }
 
-cmd_version() { echo "gerago v${VERSION}"; }
+cmd_version() { echo "grago v${VERSION}"; }
 
 cmd_help() {
   cat <<EOF
-Gerago v${VERSION} — Pre-fetch data for tool-less local models
+Grago v${VERSION} — Pre-fetch data for tool-less local models
 
 Commands:
   fetch <url>                    Fetch URL, optionally analyze
@@ -215,7 +215,7 @@ Commands:
   version                        Show version
   help                           Show this help
 
-Config: ~/.gerago/config.yaml
+Config: ~/.grago/config.yaml
 EOF
 }
 

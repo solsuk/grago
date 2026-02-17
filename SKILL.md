@@ -1,8 +1,8 @@
-# Gerago
+# Grago
 
 **Pre-fetch data via shell, feed it to tool-less local models for analysis.**
 
-Gerago bridges the gap for local LLMs (Ollama, llama.cpp, etc.) that can't use tools natively. It runs bash scripts to gather data from APIs, websites, and local files — then pipes the results as plain text to any model for summarization, analysis, or research.
+Grago bridges the gap for local LLMs (Ollama, llama.cpp, etc.) that can't use tools natively. It runs bash scripts to gather data from APIs, websites, and local files — then pipes the results as plain text to any model for summarization, analysis, or research.
 
 ## How It Works
 
@@ -14,13 +14,13 @@ Gerago bridges the gap for local LLMs (Ollama, llama.cpp, etc.) that can't use t
 
 ```bash
 # Basic: fetch a URL and analyze with local model
-gerago fetch "https://example.com/api/data" --analyze "Summarize the key findings"
+grago fetch "https://example.com/api/data" --analyze "Summarize the key findings"
 
 # Research mode: multi-source fetch + analysis
-gerago research --sources sources.yaml --prompt "Compare pricing across competitors"
+grago research --sources sources.yaml --prompt "Compare pricing across competitors"
 
 # Pipeline: chain fetch → transform → analyze
-gerago pipe \
+grago pipe \
   --fetch "curl -s https://api.example.com/stats" \
   --transform "jq '.results[]'" \
   --analyze "Identify outliers and trends" \
@@ -49,7 +49,7 @@ sources:
       Authorization: "Bearer ${API_KEY}"
 ```
 
-### Config (~/.gerago/config.yaml)
+### Config (~/.grago/config.yaml)
 ```yaml
 default_model: gemma          # Ollama model alias
 timeout: 30                   # seconds per fetch
@@ -60,8 +60,8 @@ output_format: markdown       # markdown | json | text
 ## As an OpenClaw Skill
 
 When invoked by an agent:
-1. Agent calls `gerago research --sources <yaml> --prompt "<question>"`
-2. Gerago fetches all sources in parallel
+1. Agent calls `grago research --sources <yaml> --prompt "<question>"`
+2. Grago fetches all sources in parallel
 3. Concatenates results with source labels
 4. Sends to configured local model with the prompt
 5. Returns analysis to the calling agent
@@ -78,9 +78,9 @@ This lets expensive models (Opus, GPT-4) delegate research grunt work to free lo
 
 ```bash
 # Via ClawHub
-clawhub install gerago
+clawhub install grago
 
 # Via GitHub
-git clone https://github.com/matakey/gerago.git
-cd gerago && ./install.sh
+git clone https://github.com/matakey/grago.git
+cd grago && ./install.sh
 ```

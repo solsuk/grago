@@ -1,23 +1,23 @@
-# 🦞 Gerago
+# 🦞 Grago
 
 **Pre-fetch data via shell, feed it to tool-less local models for analysis.**
 
-Gerago bridges the gap for local LLMs (Ollama, llama.cpp, etc.) that can't use tools natively. It runs bash scripts to gather data from APIs, websites, and local files — then pipes the results as plain text to any model for summarization, analysis, or research.
+Grago bridges the gap for local LLMs (Ollama, llama.cpp, etc.) that can't use tools natively. It runs bash scripts to gather data from APIs, websites, and local files — then pipes the results as plain text to any model for summarization, analysis, or research.
 
 ## Quick Start
 
 ```bash
-git clone https://github.com/matakey/gerago.git
-cd gerago && ./install.sh
+git clone https://github.com/matakey/grago.git
+cd grago && ./install.sh
 
 # Fetch a URL and analyze it
-gerago fetch "https://example.com/api/data" --analyze "Summarize key findings"
+grago fetch "https://example.com/api/data" --analyze "Summarize key findings"
 
 # Multi-source research
-gerago research --sources sources.yaml --prompt "Compare competitor pricing"
+grago research --sources sources.yaml --prompt "Compare competitor pricing"
 
 # Pipeline: fetch → transform → analyze
-gerago pipe \
+grago pipe \
   --fetch "curl -s https://api.example.com/stats" \
   --transform "jq '.results[]'" \
   --analyze "Identify outliers" \
@@ -26,7 +26,7 @@ gerago pipe \
 
 ## Why?
 
-Local models like Gemma 2, Qwen, Llama can't call APIs or browse the web. But they're great at analyzing text. Gerago does the fetching so they can do the thinking.
+Local models like Gemma 2, Qwen, Llama can't call APIs or browse the web. But they're great at analyzing text. Grago does the fetching so they can do the thinking.
 
 **Use cases:**
 - Competitive intelligence sweeps
@@ -44,7 +44,7 @@ Local models like Gemma 2, Qwen, Llama can't call APIs or browse the web. But th
 ## Config
 
 ```yaml
-# ~/.gerago/config.yaml
+# ~/.grago/config.yaml
 default_model: gemma
 timeout: 30
 max_input_chars: 16000
@@ -55,7 +55,7 @@ output_format: markdown
 
 Install via [ClawHub](https://clawhub.com):
 ```bash
-clawhub install gerago
+clawhub install grago
 ```
 
 Agents can delegate research to free local models instead of burning expensive API tokens.
