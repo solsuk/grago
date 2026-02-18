@@ -1,86 +1,73 @@
 # Grago
 
-**Pre-fetch data via shell, feed it to tool-less local models for analysis.**
+**Delegate research and data-fetch tasks to a free local LLM. Save tokens. Use your machine.**
 
-Grago bridges the gap for local LLMs (Ollama, llama.cpp, etc.) that can't use tools natively. It runs bash scripts to gather data from APIs, websites, and local files — then pipes the results as plain text to any model for summarization, analysis, or research.
+Grago bridges the gap between your OpenClaw agent and local LLMs (Ollama, llama.cpp, etc.) that can't use tools natively. It runs shell scripts to fetch live data from the web, APIs, and local files — then pipes the results into your local model with a focused prompt.
+
+Your cloud model stays sharp. Your local machine does the grunt work. Your token bill drops.
+
+## When to Use This Skill
+
+Use Grago when:
+- You need live data fetched (web pages, APIs, RSS feeds, logs)
+- The task is research-heavy and doesn't need your primary model
+- You want to keep data on your own machine (privacy)
+- You want to save tokens by offloading analysis to a local LLM
 
 ## How It Works
 
-1. **Fetch** — Shell scripts pull data (curl APIs, scrape pages, read files, grep logs)
-2. **Analyze** — Fetched text is piped to a local model with a focused prompt
-3. **Output** — Structured analysis returned (markdown, JSON, or plain text)
+1. **Fetch** — Shell scripts pull live data (curl, jq, grep, etc.)
+2. **Analyze** — Results are piped to your local Ollama model with a prompt
+3. **Return** — Structured analysis comes back to your OpenClaw agent
 
 ## Usage
 
 ```bash
-# Basic: fetch a URL and analyze with local model
-grago fetch "https://example.com/api/data" --analyze "Summarize the key findings"
+# Fetch a URL and analyze locally
+grago fetch "https://example.com" \
+  --analyze "Summarize the key points" \
+  --model gemma2
 
-# Research mode: multi-source fetch + analysis
-grago research --sources sources.yaml --prompt "Compare pricing across competitors"
+# Multi-source research from a YAML config
+grago research \
+  --sources sources.yaml \
+  --prompt "What are the main themes across these sources?"
 
-# Pipeline: chain fetch → transform → analyze
+# Pipe any shell command into your local model
 grago pipe \
-  --fetch "curl -s https://api.example.com/stats" \
-  --transform "jq '.results[]'" \
-  --analyze "Identify outliers and trends" \
-  --model gemma
+  --fetch "curl -s https://api.example.com/data" \
+  --transform "jq .results" \
+  --analyze "Identify trends and flag outliers"
 ```
 
 ## Configuration
 
-### sources.yaml
+Config file: `~/.grago/config.yaml`
+
 ```yaml
-sources:
-  - name: reddit_proptech
-    type: web
-    url: "https://old.reddit.com/r/proptech/top/.json?t=week"
-    transform: "jq '.data.children[].data | {title, score, url}'"
-  
-  - name: local_logs
-    type: file
-    path: "/var/log/myapp/*.log"
-    transform: "tail -100"
-  
-  - name: api_endpoint
-    type: api
-    url: "https://api.example.com/v1/stats"
-    headers:
-      Authorization: "Bearer ${API_KEY}"
+default_model: gemma2        # Your preferred Ollama model
+timeout: 30                  # Seconds per fetch
+max_input_chars: 16000       # Input truncation limit
+output_format: markdown      # markdown | json | text
 ```
-
-### Config (~/.grago/config.yaml)
-```yaml
-default_model: gemma          # Ollama model alias
-timeout: 30                   # seconds per fetch
-max_input_chars: 16000        # truncate input to fit context
-output_format: markdown       # markdown | json | text
-```
-
-## As an OpenClaw Skill
-
-When invoked by an agent:
-1. Agent calls `grago research --sources <yaml> --prompt "<question>"`
-2. Grago fetches all sources in parallel
-3. Concatenates results with source labels
-4. Sends to configured local model with the prompt
-5. Returns analysis to the calling agent
-
-This lets expensive models (Opus, GPT-4) delegate research grunt work to free local models.
 
 ## Requirements
 
+- Ollama installed and running locally (install.sh handles this)
+- At least one model pulled in Ollama (gemma2, mistral, llama3, etc.)
 - bash, curl, jq
-- An Ollama-compatible model (or any OpenAI-compatible endpoint)
-- Optional: `pup` for HTML parsing, `xmlstarlet` for XML
 
-## Install
+## Installation
 
 ```bash
-# Via ClawHub
-clawhub install grago
-
-# Via GitHub
-git clone https://github.com/matakey/grago.git
+git clone https://github.com/solsuk/grago.git
 cd grago && ./install.sh
 ```
+
+## Notes for the Agent
+
+- Prefer `pipe` mode over `fetch --analyze` for reliability (avoids Ollama TTY spinner issues)
+- Default model is whatever is set in `~/.grago/config.yaml`; override per-call with `--model`
+- Input is truncated to `max_input_chars` before being sent to the local model
+- Local model responses can be slow (5–30s depending on hardware and model size) — this is expected
+- Grago is for **research and fetch delegation** — not for tasks requiring your primary model's reasoning

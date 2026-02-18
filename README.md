@@ -1,65 +1,177 @@
-# 🦞 Grago
+# Grago
 
-**Pre-fetch data via shell, feed it to tool-less local models for analysis.**
+**Stop burning tokens. Start using your machine.**
 
-Grago bridges the gap for local LLMs (Ollama, llama.cpp, etc.) that can't use tools natively. It runs bash scripts to gather data from APIs, websites, and local files — then pipes the results as plain text to any model for summarization, analysis, or research.
+An OpenClaw skill that lets your agent delegate research and data-fetch tasks to a free local LLM running on your own hardware — 24/7, no cloud costs.
 
-## Quick Start
+---
+
+## The Problem
+
+You're running OpenClaw. Your agent is sharp. But every research task, every web fetch, every "go look that up" burns tokens. Cloud models are expensive.
+
+Meanwhile, you've got a Mac Mini (or any capable machine) sitting there doing nothing. It could be running a local LLM for **free**. But there's a catch:
+
+> Small local LLMs can't use tools. They can't browse the web, call APIs, or fetch live data. They're powerful — but blind.
+
+So your expensive cloud model keeps doing all the heavy lifting, and your hardware collects dust.
+
+## The Fix
+
+Grago bridges that gap. It's an OpenClaw skill that lets your agent delegate research and fetch tasks to your local machine — for free.
+
+Grago handles the tool work that local LLMs can't: it fetches URLs, hits APIs, reads files, and transforms data using shell scripts. Then it pipes the results directly into your local model with a focused prompt.
+
+**Your OpenClaw agent stays sharp. Your local machine does the legwork. Your token bill drops.**
+
+---
+
+## Who Is This For?
+
+- You use OpenClaw and your token costs are real
+- You have a Mac Mini, M-series Mac, or any machine capable of running Ollama
+- You want your agent doing 24/7 research without a cloud bill
+- You want your local models earning their keep
+- You keep your data on your own hardware
+
+**Requirements:**
+- OpenClaw (any plan)
+- A machine capable of running Ollama (Mac Mini M2+, MacBook Pro M-series, or equivalent)
+- Tested with: Gemma, Mistral, Llama, Qwen, GLM, and more
+
+---
+
+## Installation
 
 ```bash
-git clone https://github.com/matakey/grago.git
-cd grago && ./install.sh
+# Clone the repo
+git clone https://github.com/solsuk/grago.git
+cd grago
 
-# Fetch a URL and analyze it
-grago fetch "https://example.com/api/data" --analyze "Summarize key findings"
+# Run the installer (sets up Ollama + a default model if not already installed)
+./install.sh
+```
 
-# Multi-source research
-grago research --sources sources.yaml --prompt "Compare competitor pricing"
+The installer will:
+1. Check for Ollama — install it if missing
+2. Pull a recommended local model (Gemma 2 9B by default)
+3. Copy `SKILL.md` to your OpenClaw workspace skills folder
+4. Create `~/.grago/config.yaml` with sensible defaults
 
-# Pipeline: fetch → transform → analyze
+---
+
+## Usage
+
+### Fetch a URL and analyze with your local model
+
+```bash
+grago fetch "https://news.ycombinator.com/" \
+  --analyze "Summarize the top 5 stories" \
+  --model gemma2
+```
+
+### Multi-source research
+
+```bash
+grago research \
+  --sources sources.yaml \
+  --prompt "What are competitors charging for similar tools?"
+```
+
+### Chain any shell command into your local model
+
+```bash
 grago pipe \
   --fetch "curl -s https://api.example.com/stats" \
-  --transform "jq '.results[]'" \
-  --analyze "Identify outliers" \
-  --model gemma
+  --transform "jq .results" \
+  --analyze "Flag anything unusual or worth noting"
 ```
 
-## Why?
-
-Local models like Gemma 2, Qwen, Llama can't call APIs or browse the web. But they're great at analyzing text. Grago does the fetching so they can do the thinking.
-
-**Use cases:**
-- Competitive intelligence sweeps
-- API data analysis without expensive cloud models
-- Log analysis and monitoring
-- Research aggregation from multiple sources
-- 24/7 background analysis on free local hardware
-
-## Requirements
-
-- `bash`, `curl`, `jq`
-- An Ollama model (or any OpenAI-compatible endpoint)
-- Optional: `yq` (for multi-source research), `pup` (HTML parsing)
-
-## Config
-
-```yaml
-# ~/.grago/config.yaml
-default_model: gemma
-timeout: 30
-max_input_chars: 16000
-output_format: markdown
-```
+---
 
 ## As an OpenClaw Skill
 
-Install via [ClawHub](https://clawhub.com):
-```bash
-clawhub install grago
+Once installed, your OpenClaw agent can call Grago directly:
+
+1. Agent receives a research task from you
+2. Instead of burning cloud tokens, it calls `grago`
+3. Grago fetches the data locally using shell/curl
+4. Passes results to your local Ollama model with a focused prompt
+5. Returns the analysis back to your OpenClaw agent
+
+Your cloud model handles the thinking. Your local machine handles the fetching and grunt analysis. Best of both worlds.
+
+---
+
+## Configuration
+
+Config lives at `~/.grago/config.yaml`:
+
+```yaml
+default_model: gemma2        # Ollama model to use
+timeout: 30                  # Seconds per fetch
+max_input_chars: 16000       # Truncate input to fit context window
+output_format: markdown      # markdown | json | text
 ```
 
-Agents can delegate research to free local models instead of burning expensive API tokens.
+### sources.yaml Example
+
+```yaml
+sources:
+  - name: hacker_news
+    type: web
+    url: "https://news.ycombinator.com/"
+
+  - name: competitor_pricing
+    type: web
+    url: "https://competitor.com/pricing"
+
+  - name: local_logs
+    type: file
+    path: "/var/log/myapp/*.log"
+    transform: "tail -100"
+
+  - name: live_api
+    type: api
+    url: "https://api.example.com/v1/stats"
+    headers:
+      Authorization: "Bearer ${API_KEY}"
+```
+
+---
+
+## Commands
+
+| Command | Description |
+|---------|-------------|
+| `grago fetch <url>` | Fetch a URL, optionally analyze |
+| `grago research --sources <yaml>` | Multi-source fetch + analysis |
+| `grago pipe --fetch <cmd>` | Chain shell command → local model |
+| `grago version` | Show version |
+| `grago help` | Show help |
+
+---
+
+## Dependencies
+
+- `bash`, `curl`, `jq` (standard on macOS)
+- [Ollama](https://ollama.ai) (installed automatically by `install.sh`)
+- Optional: `yq` for YAML sources file parsing, `pup` for HTML parsing
+
+---
+
+## Purchase
+
+Grago is available for **$5 one-time** at [underclassic.com](https://underclassic.com).
+
+No subscription. No cloud fees. Lifetime updates.
+
+---
 
 ## License
 
-MIT
+Single-user license. One purchase, one person. Don't redistribute.
+
+---
+
+*Built for [OpenClaw](https://openclaw.ai) — the personal AI agent platform.*
