@@ -6,6 +6,15 @@ Grago bridges the gap between your OpenClaw agent and local LLMs (Ollama, llama.
 
 Your cloud model stays sharp. Your local machine does the grunt work. Your token bill drops.
 
+## ⚠️ Security Model
+
+**Grago executes shell commands.** This is intentional — it's the only way to give tool-less local LLMs access to external data.
+
+**Safe for:** Trusted, single-user environments (your own Mac Mini, VPS, workstation)  
+**NOT safe for:** Multi-tenant systems, public APIs, untrusted agents
+
+If your OpenClaw agent is compromised via prompt injection, Grago can execute arbitrary commands. This is the trade-off for free local compute. Read `SECURITY.md` in the repo for full details.
+
 ## When to Use This Skill
 
 Use Grago when:

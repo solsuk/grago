@@ -6,6 +6,28 @@ An OpenClaw skill that lets your agent delegate research and data-fetch tasks to
 
 ---
 
+## ⚠️ Security Notice
+
+**Grago executes shell commands by design.** This is intentional and necessary — local LLMs can't use tools natively, so Grago bridges the gap by running commands on your behalf.
+
+**Risk:** If your OpenClaw agent is compromised or prompt-injected, Grago can execute arbitrary commands on your machine.
+
+**Safe for:**
+- ✅ Personal Mac Mini / VPS running your own OpenClaw agent
+- ✅ Trusted, single-user environments
+- ✅ Developers who understand the security model
+
+**NOT safe for:**
+- ❌ Multi-tenant systems
+- ❌ Public-facing agent APIs
+- ❌ Environments with untrusted agents
+
+Read [SECURITY.md](SECURITY.md) for the full explanation of why "vulnerabilities" are actually features.
+
+If this security model doesn't work for you, stick with paid API services instead.
+
+---
+
 ## The Problem
 
 You're running OpenClaw. Your agent is sharp. But every research task, every web fetch, every "go look that up" burns tokens. Cloud models are expensive.
